@@ -5,11 +5,11 @@
 2. Komang Yogananda MW (05111740000114)
 
 **Penjelasan Soal Shift Modul 2 Sistem Operasi 2019:**
-* [Soal 1](https://github.com/jihannbl/SoalShift_modul2_E06#soal-1)
-* [Soal 2](https://github.com/jihannbl/SoalShift_modul2_E06#soal-2)
-* [Soal 3](https://github.com/jihannbl/SoalShift_modul2_E06#soal-3)
-* [Soal 4](https://github.com/jihannbl/SoalShift_modul2_E06#soal-4)
-* [Soal 5](https://github.com/jihannbl/SoalShift_modul2_E06#soal-5)
+* [Soal 1](##Soal-1)
+* [Soal 2](##Soal-2)
+* [Soal 3](##Soal-3)
+* [Soal 4](##Soal-4)
+* [Soal 5](##Soal-5)
 
 ## Soal 1
 Elen mempunyai pekerjaan pada studio sebagai fotografer. Suatu hari ada seorang klien yang bernama Kusuma yang meminta untuk mengubah nama file yang memiliki ekstensi .png menjadi “[namafile]_grey.png”. Karena jumlah file yang diberikan Kusuma tidak manusiawi, maka Elen meminta bantuan kalian untuk membuat suatu program C yang dapat mengubah nama secara otomatis dan diletakkan pada direktori /home/[user]/modul2/gambar.
@@ -133,6 +133,74 @@ Catatan:
 
  - Pastikan file daftar.txt dapat diakses dari text editor
 
+ **Jawaban**   
+ Dengan menggunakan 3 buah child process dan 4 buah exec yang masing masing untuk (unzip, ls, grep, dan xdg-open).   
+ Child ketiga digunakan untuk melakukan unzip file campur2.zip
+ ```c
+ char *argv[3] = {"unzip", "campur2.zip", NULL};
+ execv("/usr/bin/unzip", argv);
+ ```
+ Child kedua digunakan untuk melakukan `ls` pada direktori `campur2/` hasil extract data.
+ ```c
+ while((wait(&status)) > 0);
+dup2(pipp[1], STDOUT_FILENO);
+close(pipp[0]);
+char *argv2[3] = {"ls", "campur2/", NULL};
+execv("/bin/ls", argv2);
+ ```
+ - Potongan program `while((wait(&status)) > 0)` digunakan untuk menunggu child 3 agar selesai melakukan extract file terlebih dahulu.
+ - Fungsi `dup2(pipp[1], STDOUT_FILENO)` digunakan untuk menduplikasi `STDOUT_FILENO` kedalam `pipp[1]`. Variable **pipp** merupakan sebauh variable yang digunakan oleh pipe untuk berkomunikasi antara child 2 dengan parentnya (child 1). Indeks 1 pada variable **pipp** menandakan write end.
+ - Fungsi `close(pipp[0])` digunakan untuk menutup read end pada pipe karena pada proses ini tidak menggunakan **pipp[0]**.
+ - Eksekusi ls dengan argumen directory campur2/. **pipp[1]** akan otomatis berisi keluaran dari `execv` tersebut karena **pipp[1]** merupakan duplikasi dari `STDOUT_FILENO`.
+
+ Child pertama digunakan untuk mengeksekusi `grep`.
+```c
+while((wait(&status)) > 0);
+dup2(pipp[0], STDIN_FILENO);
+dup2(pipp_2[1], STDOUT_FILENO);
+close(pipp[1]);
+close(pipp_2[0]);
+char *argv2[3] = {"grep", ".*.txt$", NULL};
+execv("/bin/grep", argv2);
+```
+- Potongan program `while((wait(&status)) > 0)` digunakan untuk menunggu child 2 agar selesai melakukan extract file terlebih dahulu.
+- Fungsi `dup2(pipp[0], STDIN_FILENO)` digunakan untuk menduplikasi `STDIN_FILENO` ke variable **pipp[0]** (read end) dari pipp awal.
+- Fungsi `dup2(pipp_2[1], STDOUT_FILENO)` digunakan untuk menduplikasi `STDOUT_FILENO` ke variable **pipp_2**. Karena `grep` akan mengeluarkan sesuatu pada `STDOUT_FILENO` dan hasil dari grep harus dikomunikasikan dengan parent prosesnya maka variable **pipp_2** merupakan variable yang digunakan oleh pipe untuk mengkomunikasikan child 2 dengan parentnya.
+- ```c
+  close(pipp[1]);
+  close(pipp_2[0]);
+  ```
+  Karena child 2 tidak menggunakan write end dari **pipp[1]** dan read end dari **pipp_2[0]** maka kedua ujung pipe tersebut ditutup.
+
+- Kemudian eksekusi `grep` dan pilah file yang memiliki ekstensi .txt dengan menggunakan regex `.txt&`.
+
+Pada parent proses
+```c
+while((wait(&status)) > 0);
+char buff[100000];
+close(pipp_2[1]);
+close(pipp[0]);
+close(pipp[1]);
+FILE *daftar = fopen("daftar.txt", "w");
+read(pipp_2[0], buff, 100000);
+fputs(buff, daftar);
+fclose(daftar);
+char *argv[3] = {"xdg-open", "daftar.txt", NULL};
+execv("/usr/bin/xdg-open", argv);
+```
+- Potongan program `while((wait(&status)) > 0)` digunakan untuk menunggu child 2 agar selesai melakukan extract file terlebih dahulu.
+- ```c
+  close(pipp_2[1]);
+  close(pipp[0]);
+  close(pipp[1]);
+  ```
+  Karena pada proses ini hanya membutuhkan read end dari **pipp_2** maka selain itu ditutup.
+- `FILE *daftar = fopen("daftar.txt", "w")` digunakan untuk membuka file `daftar.txt` namun jika tidak ada akan membuat file `daftar.txt` tersebut.
+- `read(pipp_2[0], buff, 100000)` digunakan untuk membaca **pipp_2[0]** dan menyimpannya dalam variable **buff**.
+- ```c
+  fputs(buff, daftar);
+  fclose(daftar);
+  ```
 
 ## Soal 4
 Dalam direktori /home/[user]/Documents/makanan terdapat file makan_enak.txt yang berisikan daftar makanan terkenal di Surabaya. Elen sedang melakukan diet dan seringkali tergiur untuk membaca isi makan_enak.txt karena ngidam makanan enak. Sebagai teman yang baik, Anda membantu Elen dengan membuat program C yang berjalan setiap 5 detik untuk memeriksa apakah file makan_enak.txt pernah dibuka setidaknya 30 detik yang lalu (rentang 0 - 30 detik).
@@ -298,3 +366,5 @@ Kemudian diakhir setiap process, daemon dihentikan selama 1 menit dan counter di
 char *argv[3] = {"pkill", "soal5a", NULL};
 execv("/usr/bin/pkill", argv);
 ```
+- Dengan menggunakan `execv` untuk mengeksekusi command `pkill`.
+- Command `pkill` adalah sebuah command untuk melakukan kill pada proses yang memiliki nama sesuai argument.
