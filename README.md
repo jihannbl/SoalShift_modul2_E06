@@ -16,6 +16,46 @@ Elen mempunyai pekerjaan pada studio sebagai fotografer. Suatu hari ada seorang 
 
 Catatan : Tidak boleh menggunakan crontab.
 
+**_Jawaban:_**  
+Menggunakan library tambahan yaitu `<dirent.h>` untuk membantu membaca directory pada program c.
+```c
+DIR *gambar;
+struct dirent *entry;
+gambar = opendir(".");
+```
+- Variable **gambar** merupakan directory yang akan dibaca. Fungsi `opendir(".")` dilakukan untuk membaca file pada directory tempat program tersebut active. 
+- Variable **entry** menyimpan informasi dari file yang dibaca pada directory seperti nama dll.
+
+```c
+while(entry = readdir(gambar)){
+    int len = strlen(entry->d_name);
+    char *s = &entry->d_name[len - 4];
+    char *namafile;
+    if (strcmp(s, ".png") == 0){
+        memcpy(namafile, entry->d_name, strlen(entry->d_name) - 4);
+        char *grey = malloc(strlen("_grey") + strlen(entry->d_name) + 1 + strlen("/home/kulguy/modul2/gambar/"));
+        strcpy(grey, "/home/kulguy/modul2/gambar/");
+        strcat(grey, namafile);
+        strcat(grey, "_grey.png");
+        puts(grey);
+        puts(entry->d_name);
+        rename(entry->d_name, grey);
+    }
+}
+```
+- Fungsi `readdir(gambar)` digunakan untuk membaca sebuah file pada directory **gambar** dan kemudian informasinya dimasukkan kedalam variable **entry**.
+- `while(entry = readdir(gambar))` berfungsi untuk membaca semua file selama masih ada file yang belum terbaca.
+-  Untuk membaca namafile pada `struct dirent` dapat dengan mengakses attribute `struct dirent d_name`.
+- Variable **s** menyimpan nilai extension dari suatu file.
+- `malloc` digunakan untuk meminta memory.
+- Variable **namafile** digunakan untuk menyimpan namafile tanpa extension. Didapat dengan cara mengcopy isi dari **entry->d_name** sebanyak panjangnya dipotong 4 (jumlah panjang ekstensi).
+- ``` 
+  strcpy(grey, "/home/kulguy/modul2/gambar/");
+  strcat(grey, namafile);
+  strcat(grey, "_grey.png");
+  ```
+  fungsi - fungsi tersebut digunakan untuk mengubah nama file menjadi namafile_grey.png dan sesuai dengan directory tujuan.
+- Fungsi `rename(entry->d_name, grey)` digunakan untuk memindahkan file dengan nama **entry->d_name** pada directory aktif menjadi file bernama **grey** hasil olahan terdahulu.
   
 ## Soal 2
 Pada suatu hari Kusuma dicampakkan oleh Elen karena Elen dimenangkan oleh orang lain. Semua kenangan tentang Elen berada pada file bernama “elen.ku” pada direktori “hatiku”. Karena sedih berkepanjangan, tugas kalian sebagai teman Kusuma adalah membantunya untuk menghapus semua kenangan tentang Elen dengan membuat program C yang bisa mendeteksi owner dan group dan menghapus file “elen.ku” setiap 3 detik dengan syarat ketika owner dan grupnya menjadi “www-data”. Ternyata kamu memiliki kendala karena permission pada file “elen.ku”. Jadi, ubahlah permissionnya menjadi 777. Setelah kenangan tentang Elen terhapus, maka Kusuma bisa move on.
@@ -189,4 +229,72 @@ Ket:
 
 NB: Dilarang menggunakan crontab dan tidak memakai argumen ketika menjalankan program.
 
+**Jawaban A**  
+Menggunakan library tambahan `<time.h>` untuk membantu mengakses waktu dalam program c.
+```c
+int counter = 0;
+char namafolder[20];
+```
+- Variable **counter** diinisialisasi dengan nilai 0.
+```c
+pid_t child;
+int status = 0;
+child = fork();
+```
+- Membuat sebuah child process untuk melaksanakan salah satu antara `mkdir` ataupun `cp`.
 
+```
+counter %= 30;
+```
+Setiap 30 menit, nama file kembali lagi ke 1.
+
+Terdapat 2 kondisi yaitu apabila menit awal maka child process digunakan untuk membuat folder.  
+Kondisi pertama
+```c
+if (counter == 0){
+    time_t rawtime;
+    struct tm * timeinfo;  
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(namafolder, 20, "%d:%b:%Y-%H:%M", timeinfo);
+    if (child == 0){
+        char *argv[4] = {"mkdir", "-p", namafolder, NULL};
+        execv("/bin/mkdir", argv);
+    }
+    else{
+        while((wait(&status)) > 0);
+    }
+}
+```
+- **time_t** merupakan variable untuk menyimpan data waktu. Kemudian data waktu dipetakan dalam localtime.
+- Fungsi `strftime(namafolder, 20, "%d:%b:%Y-%H:%M", timeinfo)` digunakan untuk memetakan waktu sesuai dengan format yang diminta untuk nama folder. Hasil tersebut kemudian disimpan dalam variable **namafolder**.
+- Kemudian buat folder berdasarkan nama tersebut.
+- Untuk parent processnya melanjutkan ke operasi selanjutnya.
+Kondisi kedua
+```c
+else{
+    char namafile[20];
+    chdir(namafolder);
+    if (child == 0){
+        sprintf(namafile, "log%d.log",counter);
+        char *argv[4] = {"cp", "/var/log/syslog", namafile, NULL};
+        execv("/bin/cp", argv);
+    }
+    else{
+        while((wait(&status)) > 0);
+    }
+}
+```
+- Fungsi `sprintf(namafile, "log%d.log",counter);` digunakan untuk membuat nama file sesuai format dan memasukkannya kedalam variable **namafile**.
+- Kemudian eksekusi `cp` syslog dengan mengubah namanya menjadi namafile baru hasil proses terdahulu.
+```c
+sleep(60);
+counter++;
+```
+Kemudian diakhir setiap process, daemon dihentikan selama 1 menit dan counter ditambah untuk menyatakan menitnya bertambah.
+
+**Jawaban B**
+```c
+char *argv[3] = {"pkill", "soal5a", NULL};
+execv("/usr/bin/pkill", argv);
+```
