@@ -60,7 +60,9 @@ while(entry = readdir(gambar)){
 **Hasil**  
   Awal
   ![Awal](src/soal1/awal.png)
+  
   Setelah dijalankan
+  
   ![Akhir](src/soal1/hasil.png)
   
 ## Soal 2
@@ -151,7 +153,7 @@ Catatan:
 
  - Pastikan file daftar.txt dapat diakses dari text editor
 
- **Jawaban**   
+ **_Jawaban:_**   
  Dengan menggunakan 3 buah child process dan 4 buah exec yang masing masing untuk (unzip, ls, grep, dan xdg-open).   
  Child ketiga digunakan untuk melakukan unzip file campur2.zip
  ```c
@@ -224,6 +226,7 @@ execv("/usr/bin/xdg-open", argv);
 
 **Hasil**  
   Hasil
+  
   ![hasil](src/soal3/daftartxt.png)
 
 ## Soal 4
@@ -333,7 +336,7 @@ Ket:
 
 NB: Dilarang menggunakan crontab dan tidak memakai argumen ketika menjalankan program.
 
-**Jawaban A**  
+**_Jawaban A:_**   
 Menggunakan library tambahan `<time.h>` untuk membantu mengakses waktu dalam program c.
 ```c
 int counter = 0;
@@ -399,11 +402,14 @@ Kemudian diakhir setiap process, daemon dihentikan selama 1 menit dan counter di
 
 **Hasil A**   
   Hasil Folder
+  
   ![folder](src/soal5/folderlog.png)
+  
   File permenit
+  
   ![file](src/soal5/filepermenit.png)
 
-**Jawaban B**
+**_Jawaban B:_** 
 ```c
 char *argv[3] = {"pkill", "soal5a", NULL};
 execv("/usr/bin/pkill", argv);
@@ -412,7 +418,10 @@ execv("/usr/bin/pkill", argv);
 - Command `pkill` adalah sebuah command untuk melakukan kill pada proses yang memiliki nama sesuai argument.
 
 **Hasil B**  
-  Proses daemon sedang berjalan  
+  Proses daemon sedang berjalan 
+  
   ![ps](src/soal5/ps.png)  
+  
   Ketika `soal5b` dieksekusi  
+  
   ![kill](src/soal5/kill.png)
