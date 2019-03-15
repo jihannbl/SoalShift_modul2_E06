@@ -22,6 +22,58 @@ Pada suatu hari Kusuma dicampakkan oleh Elen karena Elen dimenangkan oleh orang 
 
 Catatan: Tidak boleh menggunakan crontab
 
+**_Jawaban:_**
+
+Menggunakan `<sys/stat.h>` header yang digunakan oleh **stat()** untuk mendapatkan informasi dari atribut pada structure.
+
+```c
+struct stat info;
+stat("/home/jihan/hatiku/elen.ku", &info);
+struct passwd *pwd = getpwuid(info.st_uid);
+struct group  *grp = getgrgid(info.st_gid);
+```
+
+ - memanggil fungsi stat untuk menyimpan seluruh informasi pada file **elen.ku** yang disimpan pada atribut **info**
+ - membuat variabel **pwd** **grp** untuk menyimpan informasi user dan group pada file
+ - `st_uid` untuk mendapatkan user ID dari file
+ - `st_gid` untuk mendapatkan group ID dari file
+ 
+```c
+if ( strcmp(pwd->pw_name, "www-data") == 0 && strcmp(grp->gr_name, "www-data") == 0)
+{
+  pid_t child = fork();
+  int status = 0;
+  if (child == 0)
+  {
+    char *argv[4] = {"chmod", "777", "/home/jihan/hatiku/elen.ku", NULL};
+    execv("/bin/chmod", argv);
+  }
+  else
+  {
+        while((wait(&status)) > 0);
+        remove("/home/jihan/hatiku/elen.ku");
+  }
+}
+ ```
+ 
+File **elen.ku** akan dihapus apabila owner dan group file tersebut yaitu "www-data", namun sebelum dihapus ubah permission pada file **elen.ku** menjadi **777**.
+
+ - Pertama cek apakah owner dan group file pada file **elen.ku** adalah "www-data" dengan sintaks 
+ ```c
+ if ( strcmp(pwd->pw_name, "www-data") == 0 && strcmp(grp->gr_name, "www-data") == 0)
+ ```
+ - Gunakan **fork()**, jalankan child untuk mengganti file permission menjadi **777** menggunakan command **chmod**. Berikut ini sintaksnya
+```c
+char *argv[4] = {"chmod", "777", "/home/jihan/hatiku/elen.ku", NULL};
+execv("/bin/chmod", argv);
+```
+ - Setelah child telah dieksekusi, maka parent akan menjalankan perintah untuk menghapus file **elen.ku**
+ ```c
+ while((wait(&status)) > 0);
+ remove("/home/jihan/hatiku/elen.ku");
+ ```
+ 
+Untuk menjalankan program c tersebut **setiap 3 detik** maka gunakan **_daemon_** dan gunakan perintah `sleep(3)` untuk menjalankannya setiap 3 detik.
 
 ## Soal 3
 Diberikan file campur2.zip. Di dalam file tersebut terdapat folder “campur2”. 
@@ -57,6 +109,68 @@ Catatan:
  
  - Contoh nama file : makan_sehat1.txt, makan_sehat2.txt, dst
 
+**_Jawaban:_**
+
+Terdapat file **makan_enak.txt** pada direktori /home/[user]/Documents/makanan, apabila file **makan_enak.txt** tersebut pernah dibuka antara _rentang waktu 0-30 detik_, maka program C akan membuat 1 file dengan nama **makan_sehat#.txt** setiap _5 detik_ .
+
+Menggunakan `<sys/stat.h>` header yang digunakan oleh **stat()** untuk mendapatkan informasi dari atribut pada structure.
+
+Menggunakan `<time.h>` header agar dapat memanggil fungsi **difftime()**.
+
+```c
+struct stat makan;
+stat("/home/jihan/Documents/makanan/makan_enak.txt", &makan);
+time_t waktu_file = makan.st_atime;
+time_t waktu_now = time(NULL);
+```
+ - memanggil fungsi stat untuk menyimpan seluruh informasi pada file **makan_enak.txt** yang disimpan pada atribut **makan**
+ - membuat variabel **waktu_file** dan **waktu_now** untuk menyimpan informasi waktu terakhir file **makan_enak.txt** diakses dan current time.
+ - `waktu_file = makan.st_atime;` untuk mendapatkan waktu terakhir file **makan_enak.txt** telah dibuka
+ - `waktu_now = time(NULL);` untuk mendapatkan waktu sekarang pada server
+ 
+```c
+double rangew = difftime(waktu_now, waktu_file);
+```
+ - memanggil fungsi **difftime()** untuk menghitung perbedaan waktu antara waktu sekarang pada server dan waktu terakhir file **makan_enak.txt** telah dibuka (waktu_now - waktu_file). Lalu disimpan pada variabel **rangew**.
+
+```c
+if(rangew >= 0 && rangew <= 30)
+	{
+		pid_t child = fork();
+		int status = 0;
+		char namafile[20];
+                chdir("/home/jihan/Documents/makanan");
+		if (child == 0){
+		 sprintf(namafile, "makan_sehat%d.txt", counter);
+		 char *argv[3] = {"touch", namafile, NULL};
+		 execv("/usr/bin/touch", argv);
+		}
+		else {
+		 while((wait(&status)) > 0);
+		 counter++;
+		}
+	}
+```
+ - Cek apakah **rangew** terdapat pada interval _0-30 detik_. Apabila iya, maka file **makan_enak.txt** telah dibuka antara rentang waktu 0-30 detik (waktu_file) yang lalu dari current time (waktu_now)
+ - Gunakan **fork()**, jalankan child untuk membuat file **makan_sehat#.txt**
+ - Sebelumnya telah diinisialisasi `int counter = 1;` sebelum loop. Karena file yang akan dibuat pertama yaitu **makan_sehat1.txt**
+ - Child akan membuat file dengan command **touch** 
+   ```c
+   if (child == 0){
+		 sprintf(namafile, "makan_sehat%d.txt", counter);
+		 char *argv[3] = {"touch", namafile, NULL};
+		 execv("/usr/bin/touch", argv);
+		}
+   ```
+ - Setelah child dieksekusi, maka akan mengeksekusi parent yang akan increment variabel **counter**.
+   ```c
+   else {
+		 while((wait(&status)) > 0);
+		 counter++;
+		}
+   ```
+
+Untuk menjalankan program c tersebut **setiap 5 detik** maka gunakan **_daemon_** dan gunakan perintah `sleep(5)` untuk menjalankannya setiap 5 detik.
 
 ## Soal 5
 Kerjakan poin a dan b di bawah:
