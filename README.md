@@ -5,11 +5,11 @@
 2. Komang Yogananda MW (05111740000114)
 
 **Penjelasan Soal Shift Modul 2 Sistem Operasi 2019:**
-* [Soal 1](##Soal-1)
-* [Soal 2](##Soal-2)
-* [Soal 3](##Soal-3)
-* [Soal 4](##Soal-4)
-* [Soal 5](##Soal-5)
+* [Soal 1](#Soal-1)
+* [Soal 2](#Soal-2)
+* [Soal 3](#Soal-3)
+* [Soal 4](#Soal-4)
+* [Soal 5](#Soal-5)
 
 ## Soal 1
 Elen mempunyai pekerjaan pada studio sebagai fotografer. Suatu hari ada seorang klien yang bernama Kusuma yang meminta untuk mengubah nama file yang memiliki ekstensi .png menjadi “[namafile]_grey.png”. Karena jumlah file yang diberikan Kusuma tidak manusiawi, maka Elen meminta bantuan kalian untuk membuat suatu program C yang dapat mengubah nama secara otomatis dan diletakkan pada direktori /home/[user]/modul2/gambar.
