@@ -56,6 +56,12 @@ while(entry = readdir(gambar)){
   ```
   fungsi - fungsi tersebut digunakan untuk mengubah nama file menjadi namafile_grey.png dan sesuai dengan directory tujuan.
 - Fungsi `rename(entry->d_name, grey)` digunakan untuk memindahkan file dengan nama **entry->d_name** pada directory aktif menjadi file bernama **grey** hasil olahan terdahulu.
+
+**Hasil**  
+  Awal
+  ![Awal](src/soal1/awal.png)
+  Setelah dijalankan
+  ![Akhir](src/soal1/awal.png)
   
 ## Soal 2
 Pada suatu hari Kusuma dicampakkan oleh Elen karena Elen dimenangkan oleh orang lain. Semua kenangan tentang Elen berada pada file bernama “elen.ku” pada direktori “hatiku”. Karena sedih berkepanjangan, tugas kalian sebagai teman Kusuma adalah membantunya untuk menghapus semua kenangan tentang Elen dengan membuat program C yang bisa mendeteksi owner dan group dan menghapus file “elen.ku” setiap 3 detik dengan syarat ketika owner dan grupnya menjadi “www-data”. Ternyata kamu memiliki kendala karena permission pada file “elen.ku”. Jadi, ubahlah permissionnya menjadi 777. Setelah kenangan tentang Elen terhapus, maka Kusuma bisa move on.
@@ -201,6 +207,12 @@ execv("/usr/bin/xdg-open", argv);
   fputs(buff, daftar);
   fclose(daftar);
   ```
+  Kemudian hasil dari `read` tersebut ditulis pada file daftar yang sudah dibuka tadi. Setelah menulis file tersebut maka tutup file daftar tersebut.
+- Terakhir eksekusi `xdg-open` untuk memastikan apakah file `daftar.txt` dapat dibuka menggunakan text editor atau tidak.
+
+**Hasil**  
+  Hasil
+  ![hasil](src/soal3/daftartxt.png)
 
 ## Soal 4
 Dalam direktori /home/[user]/Documents/makanan terdapat file makan_enak.txt yang berisikan daftar makanan terkenal di Surabaya. Elen sedang melakukan diet dan seringkali tergiur untuk membaca isi makan_enak.txt karena ngidam makanan enak. Sebagai teman yang baik, Anda membantu Elen dengan membuat program C yang berjalan setiap 5 detik untuk memeriksa apakah file makan_enak.txt pernah dibuka setidaknya 30 detik yang lalu (rentang 0 - 30 detik).
@@ -361,6 +373,12 @@ counter++;
 ```
 Kemudian diakhir setiap process, daemon dihentikan selama 1 menit dan counter ditambah untuk menyatakan menitnya bertambah.
 
+**Hasil A**   
+  Hasil Folder
+  ![folder](src/soal5/folderlog.png)
+  File permenit
+  ![file](src/soal5/filepermenit.png)
+
 **Jawaban B**
 ```c
 char *argv[3] = {"pkill", "soal5a", NULL};
@@ -368,3 +386,9 @@ execv("/usr/bin/pkill", argv);
 ```
 - Dengan menggunakan `execv` untuk mengeksekusi command `pkill`.
 - Command `pkill` adalah sebuah command untuk melakukan kill pada proses yang memiliki nama sesuai argument.
+
+**Hasil B**  
+  Proses daemon sedang berjalan 
+  ![ps](src/soal5/ps.png)
+  Ketika `soal5b` dieksekusi
+  ![kill](src/soal5/kill.png)
