@@ -53,8 +53,6 @@ int main() {
                 strcpy(grey, "/home/kulguy/modul2/gambar/");
                 strcat(grey, namafile);
                 strcat(grey, "_grey.png");
-                puts(grey);
-                puts(entry->d_name);
                 rename(entry->d_name, grey);
             }
         }
