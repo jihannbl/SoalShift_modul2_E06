@@ -121,6 +121,18 @@ execv("/bin/chmod", argv);
  
 Untuk menjalankan program c tersebut **setiap 3 detik** maka gunakan **_daemon_** dan gunakan perintah `sleep(3)` untuk menjalankannya setiap 3 detik.
 
+**Hasil**
+
+Awal
+![Awal](src/soal2/soal2_1.PNG)
+
+Setelah dijalankan
+
+![Dijalankan](src/soal2/soal2_2.PNG)
+
+File elen.ku terhapus
+![Akhir](src/soal2/soal2_3.PNG)
+
 ## Soal 3
 Diberikan file campur2.zip. Di dalam file tersebut terdapat folder “campur2”. 
 Buatlah program C yang dapat :
@@ -291,6 +303,18 @@ if(rangew >= 0 && rangew <= 30)
    ```
 
 Untuk menjalankan program c tersebut **setiap 5 detik** maka gunakan **_daemon_** dan gunakan perintah `sleep(5)` untuk menjalankannya setiap 5 detik.
+
+**Hasil**
+
+Pada direktori makanan hanya terdapat file makan_enak.txt
+![Awal](src/soal4/soal4_1.PNG)
+
+File makan_enak.txt dibuka
+
+![Dibuka](src/soal4/soal4_2.PNG)
+
+Setelah dibuka maka terdapat beberapa file makan_sehat#.txt
+![Akhir](src/soal4/soal4_3.PNG)
 
 ## Soal 5
 Kerjakan poin a dan b di bawah:
