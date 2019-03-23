@@ -47,7 +47,7 @@ int main() {
             int len = strlen(entry->d_name);
             char *s = &entry->d_name[len - 4];
             char *namafile;
-            if (strcmp(s, ".png") == 0){
+            if (strcmp(s, ".png") == 0 && entry->d_type == DT_REG){
                 memcpy(namafile, entry->d_name, strlen(entry->d_name) - 4);
                 char *grey = malloc(strlen("_grey") + strlen(entry->d_name) + 1 + strlen("/home/kulguy/modul2/gambar/"));
                 strcpy(grey, "/home/kulguy/modul2/gambar/");

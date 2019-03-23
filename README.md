@@ -31,7 +31,7 @@ while(entry = readdir(gambar)){
     int len = strlen(entry->d_name);
     char *s = &entry->d_name[len - 4];
     char *namafile;
-    if (strcmp(s, ".png") == 0){
+    if (strcmp(s, ".png") == 0 && entry->d_type == DT_REG){
         memcpy(namafile, entry->d_name, strlen(entry->d_name) - 4);
         char *grey = malloc(strlen("_grey") + strlen(entry->d_name) + 1 + strlen("/home/kulguy/modul2/gambar/"));
         strcpy(grey, "/home/kulguy/modul2/gambar/");
@@ -56,6 +56,7 @@ while(entry = readdir(gambar)){
   ```
   fungsi - fungsi tersebut digunakan untuk mengubah nama file menjadi namafile_grey.png dan sesuai dengan directory tujuan.
 - Fungsi `rename(entry->d_name, grey)` digunakan untuk memindahkan file dengan nama **entry->d_name** pada directory aktif menjadi file bernama **grey** hasil olahan terdahulu.
+- `if (strcmp(s, ".png") == 0 && entry->d_type == DT_REG)` digunakan untuk mendeteksi file yang memiliki nama berakhiran png dan merupakan file regular (bukan directory).
 
 **Hasil**  
   Awal
@@ -390,10 +391,12 @@ else{
     else{
         while((wait(&status)) > 0);
     }
+    chdir("..");
 }
 ```
 - Fungsi `sprintf(namafile, "log%d.log",counter);` digunakan untuk membuat nama file sesuai format dan memasukkannya kedalam variable **namafile**.
 - Kemudian eksekusi `cp` syslog dengan mengubah namanya menjadi namafile baru hasil proses terdahulu.
+- Sebelum copy file fungsi `chdir(namafolder)` dipanggil terlebih dahulu agar dicopy ke folder yang sudah dibuat. Setelah sukses tercopy `chdir("..")` dipanggil untuk mengembalikan directory ke tempat asal.
 ```c
 sleep(60);
 counter++;
