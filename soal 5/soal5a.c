@@ -71,6 +71,7 @@ int main() {
             else{
                 while((wait(&status)) > 0);
             }
+            chdir("..");
         }
         sleep(60);
         counter++;
